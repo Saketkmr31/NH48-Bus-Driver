@@ -19,7 +19,7 @@ body{color:#fff;font-family:"Noto Sans Devanagari",Arial,sans-serif}
 .btn:hover{transform:translateY(-2px);border-color:rgba(255,205,102,.85)}
 
 /* HOME */
-#homeScreen{z-index:1;background:linear-gradient(rgba(0,0,0,.34),rgba(0,0,0,.72)),url("assets/bus-bg.png") center/cover no-repeat;transition:.55s}
+#homeScreen{z-index:1;background:linear-gradient(rgba(0,0,0,.34),rgba(0,0,0,.72)),url("bus-bg.png") center/cover no-repeat;transition:.55s}
 #homeScreen:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,rgba(255,136,30,.07),rgba(0,0,0,.12) 45%,rgba(0,0,0,.58) 100%)}
 .brand{position:absolute;top:28px;left:5%;z-index:8;display:flex;align-items:center;gap:10px;font-family:"Oswald",sans-serif;font-size:14px;font-weight:600;letter-spacing:3px;color:#f6e3bd;text-transform:uppercase}
 .brand-dot{width:5px;height:5px;border-radius:50%;background:var(--gold)}
@@ -345,7 +345,7 @@ body.game-mode #gameScreen{opacity:1;visibility:visible;pointer-events:auto}
   <div id="trafficLayer"></div>
 
   <div id="playerBus" class="player-bus">
-    <img src="assets/bus2.png" alt="Player Bus">
+    <img src="bus2.png" alt="Player Bus">
     <div class="bus-nameplate">SAKET TRAVELS</div>
     <div class="bus-turn bt1"></div>
     <div class="bus-turn bt2"></div>
@@ -393,10 +393,10 @@ body.game-mode #gameScreen{opacity:1;visibility:visible;pointer-events:auto}
   </div>
 </section>
 
-<audio id="horn1" src="assets/horn1.mp3" preload="auto"></audio>
-<audio id="horn2" src="assets/horn2.mp3" preload="auto"></audio>
-<audio id="horn3" src="assets/horn3.mp3" preload="auto"></audio>
-<audio id="horn4" src="assets/horn4.mp3" preload="auto"></audio>
+<audio id="horn1" src="horn1.mp3" preload="auto"></audio>
+<audio id="horn2" src="horn2.mp3" preload="auto"></audio>
+<audio id="horn3" src="horn3.mp3" preload="auto"></audio>
+<audio id="horn4" src="horn4.mp3" preload="auto"></audio>
 
 <script>
 const homeScreen=document.getElementById('homeScreen');
@@ -523,13 +523,11 @@ function updateProgression(){
    Uses only the uploaded transparent PNG assets.
    The cargo pool uses only the approved cargo image. */
 const trafficProfiles=[
-  /* Balanced against the 108 x 196 player bus:
-     traffic is visible and realistic, but never larger than the player's bus. */
-  {kind:"bus",   extra:"bus",   images:["assets/bus1.png","assets/bus2.png"],   width:96, height:164,min:.64,max:.82,drift:.04,brain:"heavy", aggression:.24},
-  {kind:"car",   extra:"",      images:["assets/car1.png","assets/car2.png"],   width:84, height:136,min:.92,max:1.12,drift:.10,brain:"normal",aggression:.52},
-  {kind:"taxi",  extra:"taxi",  images:["assets/taxi1.png","assets/taxi2.png"], width:84, height:136,min:.90,max:1.10,drift:.11,brain:"fast",  aggression:.72},
-  {kind:"suv",   extra:"suv",   images:["assets/suv1.png","assets/suv2.png"],   width:90, height:144,min:.88,max:1.08,drift:.08,brain:"fast",  aggression:.64},
-  {kind:"cargo", extra:"cargo", images:["assets/cargo2.png"],                    width:100,height:160,min:.58,max:.74,drift:.03,brain:"heavy", aggression:.18}
+  {kind:"bus", extra:"bus", images:["bus1.png","bus2.png"], width:96, height:164,min:.64,max:.82,drift:.04,brain:"heavy", aggression:.24},
+  {kind:"car", extra:"", images:["car1.png","car2.png"], width:84, height:136,min:.92,max:1.12,drift:.10,brain:"normal",aggression:.52},
+  {kind:"taxi", extra:"taxi", images:["taxi1.png","taxi2.png"], width:84, height:136,min:.90,max:1.10,drift:.11,brain:"fast", aggression:.72},
+  {kind:"suv", extra:"suv", images:["suv1.png","suv2.png"], width:90, height:144,min:.88,max:1.08,drift:.08,brain:"fast", aggression:.64},
+  {kind:"cargo", extra:"cargo", images:["cargo2.png"], width:100,height:160,min:.58,max:.74,drift:.03,brain:"heavy", aggression:.18}
 ];
 
 function startDriving(){
