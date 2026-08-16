@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>बस ड्राइवर | NH 48 Bus Driver</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root{--gold:#f6bd57;--cream:#fff5df;--panel:rgba(8,12,15,.78)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#080604}
+body{color:#fff;font-family:"Noto Sans Devanagari",Arial,sans-serif}
+.screen{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+.hidden-screen{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+.btn{border:1px solid rgba(255,213,135,.42);background:rgba(12,9,7,.74);color:#f7e7c7;border-radius:28px;font-family:"Oswald",sans-serif;font-weight:700;letter-spacing:1.5px;cursor:pointer;transition:.2s}
+.btn:hover{transform:translateY(-2px);border-color:rgba(255,205,102,.85)}
+
+/* HOME */
+#homeScreen{z-index:1;background:linear-gradient(rgba(0,0,0,.34),rgba(0,0,0,.72)),url("assets/bus-bg.png") center/cover no-repeat;transition:.55s}
+#homeScreen:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,rgba(255,136,30,.07),rgba(0,0,0,.12) 45%,rgba(0,0,0,.58) 100%)}
+.brand{position:absolute;top:28px;left:5%;z-index:8;display:flex;align-items:center;gap:10px;font-family:"Oswald",sans-serif;font-size:14px;font-weight:600;letter-spacing:3px;color:#f6e3bd;text-transform:uppercase}
+.brand-dot{width:5px;height:5px;border-radius:50%;background:var(--gold)}
+.top-menu{position:absolute;top:20px;right:5%;z-index:20;display:flex;gap:10px}
+.menu-btn{padding:10px 18px;font-size:12px}
+.home-content{position:relative;z-index:4;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:55px 20px 25px}
+.eyebrow{margin-bottom:4px;color:#e7bd6b;font-family:"Oswald",sans-serif;font-size:11px;font-weight:600;letter-spacing:5px;text-transform:uppercase}
+.hindi-title{font-size:clamp(60px,7vw,125px);font-weight:900;line-height:.92;letter-spacing:-3px;color:var(--cream);text-shadow:0 4px 0 #5b3119,0 8px 25px rgba(0,0,0,.5)}
+.english-title{margin-top:8px;font-family:"Bebas Neue",sans-serif;font-size:clamp(55px,5.5vw,95px);letter-spacing:5px;line-height:.9;color:var(--gold);text-shadow:0 5px 20px rgba(0,0,0,.45)}
+.tagline{margin-top:12px;color:rgba(255,242,215,.88);font-size:13px;font-weight:600}
+.route-line{width:min(380px,80vw);display:flex;align-items:center;justify-content:center;gap:12px;margin:13px auto 10px}
+.route-line:before,.route-line:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(246,188,79,.75))}
+.route-line:after{background:linear-gradient(90deg,rgba(246,188,79,.75),transparent)}
+.route-text{color:#e8bd69;font-size:11px;white-space:nowrap}
+.drive-btn{margin-top:15px;border:0;min-width:215px;padding:15px 28px;border-radius:40px;background:linear-gradient(135deg,#f4b43f,#ffd76c);color:#231405;font-family:"Oswald",sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 8px 25px rgba(245,167,44,.28);transition:.2s}
+.drive-btn:hover{transform:translateY(-3px);box-shadow:0 13px 35px rgba(245,167,44,.45)}
+.creator-credit{margin-top:12px;color:rgba(255,255,255,.52);font-family:"Oswald",sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase}
+.creator-credit span{color:#e8b95c;font-weight:600}
+.road-sign{position:absolute;right:5%;top:50%;transform:translateY(-20%);z-index:2;width:230px;background:rgba(8,18,17,.78);border:3px solid rgba(142,94,52,.65);border-radius:14px;overflow:hidden;backdrop-filter:blur(5px);box-shadow:0 15px 35px rgba(0,0,0,.35)}
+.road-sign-title{padding:14px;color:#e6b663;font-family:"Oswald",sans-serif;font-size:24px;border-bottom:2px solid rgba(174,117,64,.35)}
+.road-place{display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(174,117,64,.22);color:#d8b77e;font-size:18px;font-weight:700}
+.road-place:last-child{border-bottom:none}.distance{font-family:"Oswald",sans-serif;color:#c69c61}
+
+/* SPOTIFY */
+#spotifyDock{position:fixed;z-index:100;left:50%;top:46px;width:min(650px,88vw);transform:translateX(-50%);transition:.45s}
+.spotify-label{margin-bottom:7px;text-align:center;color:#f2c66d;font-family:"Oswald",sans-serif;font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase}
+.spotify-player{height:152px;overflow:hidden;border-radius:18px;border:1px solid rgba(255,196,88,.25);box-shadow:0 12px 35px rgba(0,0,0,.38);background:#121212}
+.spotify-player iframe{display:block;width:100%;height:152px;border:0}
+
+/* GAME SCENE */
+#gameScreen{z-index:5;background:radial-gradient(circle at 50% 20%,rgba(255,174,69,.34),transparent 16%),linear-gradient(to bottom,#17090d 0%,#5b1210 24%,#d1461d 43%,#2c2012 43.5%,#07100b 100%);transition:.55s}
+.game-sky-glow{position:absolute;left:50%;top:11%;width:110px;height:110px;transform:translateX(-50%);border-radius:50%;background:#ffd16b;box-shadow:0 0 35px 14px rgba(255,166,47,.45)}
+.mountain{position:absolute;bottom:48%;height:30%;background:#2b1715;opacity:.95}
+.m1{left:-5%;width:38%;clip-path:polygon(0 100%,38% 25%,72% 100%)}
+.m2{left:25%;width:33%;clip-path:polygon(0 100%,45% 18%,100% 100%)}
+.m3{right:-2%;width:40%;clip-path:polygon(0 100%,38% 18%,70% 100%)}
+.tree-line{position:absolute;left:0;right:0;bottom:0;height:58%;background:radial-gradient(circle at 3% 25%,#06120d 0 55px,transparent 57px),radial-gradient(circle at 9% 55%,#07140e 0 78px,transparent 80px),radial-gradient(circle at 17% 32%,#06150e 0 62px,transparent 64px),radial-gradient(circle at 83% 34%,#06150e 0 62px,transparent 64px),radial-gradient(circle at 93% 20%,#06120d 0 72px,transparent 74px),radial-gradient(circle at 97% 58%,#06120d 0 95px,transparent 97px),linear-gradient(to top,#06100a 0%,rgba(5,18,10,.9) 55%,transparent 100%)}
+.road{position:absolute;left:50%;bottom:-4%;transform:translateX(-50%);width:min(88vw,1300px);height:82%;clip-path:polygon(42% 0%,58% 0%,100% 100%,0 100%);background:linear-gradient(to bottom,#3a3b3e,#232528 35%,#111315);overflow:hidden;box-shadow:inset 0 20px 40px rgba(255,255,255,.025)}
+.road:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.06) 0 2px,transparent 2px 80px);opacity:.25}
+.road-lines{position:absolute;left:50%;bottom:-10%;transform:translateX(-50%);width:14px;height:92%;z-index:2;overflow:hidden}
+.road-lines:before{content:"";position:absolute;left:50%;top:-220px;transform:translateX(-50%);width:9px;height:130%;background:repeating-linear-gradient(to bottom,transparent 0 38px,#f3f0e8 38px 74px);animation:roadMove .75s linear infinite paused}
+body.driving .road-lines:before{animation-play-state:running}
+@keyframes roadMove{to{transform:translate(-50%,110px)}}
+.guardrail{position:absolute;z-index:9;width:5px;height:94%;bottom:-8%;background:linear-gradient(#9d8f77,#4a4540 35%,#a8a09a 55%,#373737);box-shadow:0 0 8px rgba(255,228,171,.28)}
+.guardrail:before{content:"";position:absolute;left:-9px;top:0;width:23px;height:100%;background:repeating-linear-gradient(to bottom,transparent 0 70px,rgba(200,200,200,.9) 70px 75px,transparent 75px 145px);opacity:.8}
+.guardrail.left{left:7.8%;transform:rotate(-25deg)}.guardrail.right{right:7.8%;transform:rotate(25deg)}
+.reflector{position:absolute;z-index:10;width:10px;height:10px;border-radius:50%;background:#ffd76b;box-shadow:0 0 13px 4px rgba(255,192,70,.65);animation:blink 1.6s ease-in-out infinite}
+.reflector.r1{left:19%;bottom:22%}.reflector.r2{left:12%;bottom:9%;animation-delay:.5s}.reflector.r3{right:19%;bottom:22%;animation-delay:.3s}.reflector.r4{right:12%;bottom:9%;animation-delay:.8s}.reflector.r5{left:35%;bottom:45%;animation-delay:1s}.reflector.r6{right:35%;bottom:45%;animation-delay:.7s}
+@keyframes blink{50%{opacity:.35;transform:scale(.75)}}
+.street-lights{position:absolute;inset:0}.light{position:absolute;width:10px;height:10px;border-radius:50%;background:#ffbd59;box-shadow:0 0 16px 6px rgba(255,174,69,.38)}.l1{left:35%;bottom:31%}.l2{right:36%;bottom:31%}.l3{left:28%;bottom:17%}.l4{right:29%;bottom:17%}.l5{left:39%;bottom:47%}.l6{right:39%;bottom:47%}
+.distant-city{position:absolute;left:0;right:0;bottom:42%;height:60px;z-index:6;background:repeating-linear-gradient(90deg,transparent 0 18px,rgba(255,184,77,.8) 18px 21px,transparent 21px 55px);opacity:.25}
+
+/* HUD */
+.game-title{position:absolute;top:18px;left:50%;transform:translateX(-50%);z-index:30;color:#f0c56d;font-family:"Oswald",sans-serif;font-size:12px;font-weight:700;letter-spacing:6px;text-transform:uppercase}
+.hud{position:absolute;top:18px;left:18px;z-index:40;display:flex;gap:10px}
+.hud-card{min-width:92px;padding:10px 14px;border-radius:14px;background:var(--panel);border:1px solid rgba(255,204,110,.28);backdrop-filter:blur(10px)}
+.hud-label{font-family:"Oswald",sans-serif;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.58)}
+.hud-value{margin-top:3px;font-family:"Oswald",sans-serif;font-size:22px;color:#f7d17b}
+.game-top-right{position:absolute;right:18px;top:18px;z-index:50}.small-btn{padding:9px 16px;font-size:11px}
+
+/* PLAYER BUS — REAL IMAGE + CUSTOM NAME + VISIBLE LIGHTS */
+.player-bus{
+  position:absolute;
+  left:50%;
+  bottom:7.2%;
+  width:150px;
+  height:220px;
+  transform:translateX(-50%);
+  z-index:20;
+  filter:drop-shadow(0 20px 20px rgba(0,0,0,.62));
+  will-change:left,transform;
+  transform-origin:50% 90%;
+}
+.player-bus img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center bottom;
+  display:block;
+  pointer-events:none;
+  user-select:none;
+  z-index:3;
+}
+.bus-nameplate{
+  position:absolute;
+  left:50%;
+  top:46%;
+  transform:translateX(-50%);
+  z-index:8;
+  padding:3px 7px 4px;
+  min-width:74px;
+  text-align:center;
+  border:1px solid #f2c766;
+  border-radius:5px;
+  background:rgba(18,14,10,.92);
+  color:#ffe29a;
+  font-size:7px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.8px;
+  text-shadow:0 1px 2px #000;
+  box-shadow:0 2px 7px rgba(0,0,0,.55), inset 0 0 7px rgba(255,210,103,.12);
+  pointer-events:none;
+}
+.player-bus .headlight{
+  position:absolute;
+  bottom:18.5%;
+  width:15px;
+  height:8px;
+  border-radius:6px 6px 5px 5px;
+  z-index:7;
+  background:#ffbd28;
+  border:1px solid rgba(255,244,178,.75);
+  box-shadow:
+    0 0 8px 2px rgba(255,184,30,.95),
+    0 0 18px 5px rgba(255,165,20,.42);
+  opacity:.95;
+  transition:background .12s,box-shadow .12s,opacity .12s,transform .12s;
+}
+.player-bus .hl1{left:19%}
+.player-bus .hl2{right:19%}
+.player-bus .bus-turn{
+  position:absolute;
+  bottom:22.5%;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  z-index:8;
+  background:#7d1111;
+  opacity:.68;
+}
+.player-bus .bt1{left:14%}
+.player-bus .bt2{right:14%}
+.player-bus .bus-brake-glow{
+  position:absolute;
+  left:50%;
+  bottom:10%;
+  width:78%;
+  height:32px;
+  transform:translateX(-50%);
+  z-index:2;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,46,46,.55),rgba(255,46,46,0) 68%);
+  opacity:0;
+  transition:opacity .08s;
+}
+.player-bus.braking .bus-brake-glow{opacity:1}
+.player-bus.signal-left .bt1,.player-bus.signal-right .bt2{
+  background:#ff2020;
+  opacity:1;
+  box-shadow:0 0 12px 4px rgba(255,25,25,.95), 0 0 24px 7px rgba(255,20,20,.45);
+  animation:indicatorBlink .55s steps(2,end) infinite;
+}
+@keyframes indicatorBlink{50%{opacity:.15;box-shadow:none}}
+body.lights-on .player-bus .headlight{
+  background:#fff9cf;
+  opacity:1;
+  transform:scale(1.14);
+  box-shadow:
+    0 0 13px 4px rgba(255,245,177,1),
+    0 0 32px 10px rgba(255,211,85,.72),
+    0 0 58px 18px rgba(255,193,57,.34);
+}
+body.lights-on .player-bus:after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:12%;
+  width:250px;
+  height:175px;
+  transform:translateX(-50%);
+  background:radial-gradient(ellipse at 50% 100%,rgba(255,226,146,.24),rgba(255,226,146,.08) 40%,transparent 72%);
+  z-index:1;
+  pointer-events:none;
+}
+.player-bus.horn-active{
+  animation:busHornPulse .18s ease-in-out 3;
+}
+@keyframes busHornPulse{
+  50%{
+    filter:brightness(1.18)
+      drop-shadow(0 0 18px rgba(255,210,102,.72))
+      drop-shadow(0 20px 20px rgba(0,0,0,.62));
+  }
+}
+
+/* INDIAN SCENE */
+.indian-scene{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden}
+.dhaba{position:absolute;left:3%;bottom:16%;width:210px;height:118px;opacity:.95}.dhaba-roof{position:absolute;left:0;right:0;top:0;height:28px;background:linear-gradient(#7a3d1e,#2a1710);clip-path:polygon(4% 100%,10% 0,90% 0,96% 100%);box-shadow:0 8px 18px rgba(0,0,0,.4)}.dhaba-wall{position:absolute;left:12px;right:12px;top:25px;bottom:0;background:linear-gradient(90deg,#3b2116,#6c351b 50%,#2b1710);border:2px solid rgba(255,178,79,.22)}.dhaba-sign{position:absolute;left:20px;top:39px;padding:5px 10px;background:#ead49b;color:#4a2010;border-radius:3px;font-size:13px;font-weight:800;box-shadow:0 0 12px rgba(255,185,79,.28)}.dhaba-lamp{position:absolute;width:7px;height:7px;border-radius:50%;background:#ffd06a;box-shadow:0 0 12px 4px rgba(255,184,67,.7);top:22px}.dl1{left:28px}.dl2{left:67px}.dl3{left:106px}.dl4{left:145px}.dl5{left:184px}
+.milestone{position:absolute;right:5%;bottom:25%;width:92px;height:62px;background:linear-gradient(#f3e9cf 0 48%,#171717 49%);border-radius:48px 48px 4px 4px;border:3px solid #5d574d;color:#25231f;font-family:"Oswald",sans-serif;text-align:center;padding-top:6px;font-weight:700;box-shadow:0 8px 14px rgba(0,0,0,.4)}.milestone span{display:block;font-size:12px;line-height:1}.milestone small{display:block;color:#fff;font-size:11px;margin-top:6px}
+.road-sign-mini{position:absolute;right:17%;bottom:39%;width:112px;height:66px;border:3px solid #d9d2b7;border-radius:3px;background:#143a31;color:#f5e4b8;font-weight:700;padding:7px 10px;box-shadow:0 8px 16px rgba(0,0,0,.35)}.road-sign-mini:after{content:"";position:absolute;width:4px;height:62px;background:#777;left:50%;top:100%}.road-sign-mini div{font-size:12px;border-bottom:1px solid rgba(255,255,255,.25);padding-bottom:2px;margin-bottom:3px}.road-sign-mini div:last-child{border:0}
+.truck-far{position:absolute;left:20%;bottom:34%;width:52px;height:76px;transform:scale(.72)}.truck-cargo{position:absolute;left:0;right:0;top:0;height:48px;border-radius:4px;background:linear-gradient(90deg,#19495a,#e7a23b 50%,#9b3324);border:3px solid #2c211a}.truck-cab{position:absolute;left:8px;right:8px;bottom:0;height:30px;border-radius:5px;background:#d9d4c4;border:3px solid #30251c}.truck-cab:before{content:"";position:absolute;left:5px;right:5px;top:3px;height:10px;background:#162329}
+body.driving .indian-scene{animation:scenePulse 3s ease-in-out infinite}@keyframes scenePulse{50%{filter:brightness(1.08)}}
+
+/* TRAFFIC */
+#trafficLayer{position:absolute;inset:0;z-index:15;pointer-events:none}
+.traffic{position:absolute;filter:drop-shadow(0 10px 12px rgba(0,0,0,.55));will-change:left,top,width,height;overflow:visible}
+.traffic img.vehicle-image{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;user-select:none}
+.traffic .car-body,.traffic .car-window,.traffic .tail{display:none}
+
+/* CONTROLS */
+.help{position:absolute;left:18px;bottom:18px;z-index:50;padding:9px 13px;border-radius:9px;background:rgba(7,11,11,.72);color:#f3dfb8;font-family:"Oswald",sans-serif;font-size:10px;letter-spacing:1.3px}
+.game-controls{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:50;display:flex;gap:8px;padding:8px;border:1px solid rgba(247,193,91,.28);border-radius:18px;background:rgba(9,13,15,.78);backdrop-filter:blur(10px)}
+.game-btn{min-width:74px;padding:12px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(#2c3135,#17191b);color:#f4e3c4;font-family:"Oswald",sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer}.game-btn:active,.game-btn.active{transform:translateY(1px);background:#4a3922;border-color:#e9b858}
+.mobile-controls{position:absolute;right:18px;bottom:18px;z-index:60;display:flex;gap:10px}.mobile-circle{width:56px;height:56px;border-radius:50%;border:1px solid rgba(255,213,135,.38);background:rgba(13,15,16,.7);color:#f4d589;font-size:23px;cursor:pointer}
+
+/* POPUPS */
+#rewardPopup{position:absolute;left:50%;top:22%;transform:translate(-50%,-10px);z-index:99;pointer-events:none;opacity:0;padding:10px 16px;border-radius:14px;background:rgba(0,0,0,.6);border:1px solid rgba(255,215,120,.45);color:#fff;font-weight:900;font-size:17px;transition:.18s}
+#rewardPopup.show{opacity:1;transform:translate(-50%,0)}
+#progressPopup{position:absolute;left:50%;top:31%;transform:translate(-50%,-14px) scale(.96);z-index:99;pointer-events:none;opacity:0;min-width:260px;padding:15px 22px;border-radius:18px;text-align:center;background:linear-gradient(135deg,rgba(36,29,19,.92),rgba(12,16,18,.94));border:1px solid rgba(255,203,103,.6);box-shadow:0 18px 50px rgba(0,0,0,.45);transition:.28s}
+#progressPopup.show{opacity:1;transform:translate(-50%,0) scale(1)}
+#routePanel{position:absolute;left:50%;top:58px;transform:translateX(-50%);z-index:55;width:min(560px,72vw);padding:10px 14px 11px;border-radius:16px;background:rgba(8,12,15,.78);border:1px solid rgba(255,204,110,.28);backdrop-filter:blur(10px);box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.route-head{display:flex;align-items:center;justify-content:space-between;font-family:"Oswald",sans-serif;font-size:11px;letter-spacing:1.5px;color:#f5d38a}
+#routeNext{color:#fff0cb;font-size:14px}
+.route-track{position:relative;height:7px;margin:9px 4px 8px;border-radius:99px;background:rgba(255,255,255,.13);overflow:hidden}
+#routeProgressFill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#e89038,#ffd56e);transition:width .25s}
+.route-stops{display:flex;justify-content:space-between;gap:5px;font-family:"Oswald",sans-serif;font-size:9px;letter-spacing:.6px;color:rgba(255,255,255,.52)}
+.route-stop.active{color:#ffe09a}.route-stop.done{color:#f4bd59}
+#routePopup{position:absolute;left:50%;top:39%;transform:translate(-50%,-12px) scale(.96);z-index:100;pointer-events:none;opacity:0;width:min(390px,84vw);padding:20px;border-radius:20px;text-align:center;background:linear-gradient(145deg,rgba(46,31,18,.96),rgba(11,15,17,.96));border:1px solid rgba(255,207,106,.65);box-shadow:0 24px 70px rgba(0,0,0,.55);transition:.3s}
+#routePopup.show{opacity:1;transform:translate(-50%,0) scale(1)}
+.traffic{will-change:transform,left,top,width,height}
+.traffic.dense{filter:brightness(.96)}
+#routePopup strong{display:block;font-family:"Oswald",sans-serif;font-size:30px;letter-spacing:2px;color:#ffd276}
+#routePopup span{display:block;margin-top:5px;font-family:"Oswald",sans-serif;font-size:13px;letter-spacing:1px;color:#f7e7c6}
+.route-complete-overlay{position:absolute;inset:0;z-index:110;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:.3s;backdrop-filter:blur(7px)}
+.route-complete-overlay.show{opacity:1;visibility:visible}
+.route-complete-card{width:min(480px,88vw);padding:38px 30px;border-radius:24px;text-align:center;background:linear-gradient(145deg,#342313,#151719);border:1px solid rgba(255,206,99,.62);box-shadow:0 30px 100px rgba(0,0,0,.65)}
+.route-complete-card h2{font-family:"Oswald",sans-serif;font-size:42px;letter-spacing:2px;color:#ffd276}
+.route-complete-card p{margin:8px 0;color:#eee0c5}
+.route-reward{font-family:"Oswald",sans-serif;font-size:28px;color:#fff2c8}
+#progressPopup strong{display:block;font-family:"Oswald",sans-serif;font-size:27px;letter-spacing:2px;color:#ffd276}
+#progressPopup span{display:block;margin-top:3px;font-family:"Oswald",sans-serif;font-size:12px;letter-spacing:1.4px;color:#f4e5c7}
+.level-card .hud-value{font-size:18px}
+.crash-overlay{position:absolute;inset:0;z-index:90;background:rgba(0,0,0,.68);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:.25s;backdrop-filter:blur(5px)}.crash-overlay.show{opacity:1;visibility:visible}.crash-card{width:min(430px,88vw);padding:35px 30px;text-align:center;border-radius:22px;background:linear-gradient(145deg,#2a1a15,#171313);border:1px solid rgba(246,184,83,.42);box-shadow:0 25px 80px rgba(0,0,0,.55)}.crash-card h2{font-family:"Oswald",sans-serif;font-size:42px;color:#ff8e73;letter-spacing:2px}.crash-card p{margin:8px 0;color:#d8d0c9}.final-distance{font-family:"Oswald",sans-serif;font-size:30px;color:#f5cf7d;margin:4px}.crash-actions{display:flex;justify-content:center;gap:10px;margin-top:22px}.retry-btn,.home-modal-btn{border:0;border-radius:28px;padding:13px 20px;font-family:"Oswald",sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer}.retry-btn{background:linear-gradient(135deg,#f6b650,#ed832d);color:#241406}.home-modal-btn{background:#25282a;color:#f2e0bf;border:1px solid rgba(255,255,255,.14)}
+
+/* SPOTIFY GAME MODE */
+body.game-mode #spotifyDock{left:auto;right:18px;top:100px;width:380px;max-width:31vw;transform:none}
+body.game-mode #spotifyDock .spotify-label{display:none}
+body.game-mode #spotifyDock .spotify-player,body.game-mode #spotifyDock iframe{height:152px;width:100%;border-radius:16px}
+body.game-mode #homeScreen{opacity:0;visibility:hidden;pointer-events:none}
+body.game-mode #gameScreen{opacity:1;visibility:visible;pointer-events:auto}
+
+@media(max-width:1100px){.road-sign{opacity:.5;transform:translateY(-20%) scale(.82)}body.game-mode #spotifyDock{width:320px;max-width:38vw}.game-btn{min-width:62px;padding:10px}.dhaba{transform:scale(.82);transform-origin:left bottom}.road-sign-mini{right:14%;transform:scale(.85)}.milestone{transform:scale(.85)}}
+@media(max-width:800px){#routePanel{top:50px;width:88vw;padding:8px 10px}.route-stops{font-size:7px}.route-head{font-size:9px}.dhaba,.road-sign-mini,.milestone,.truck-far{display:none}.road-sign{display:none}.hindi-title{font-size:70px}.english-title{font-size:60px}#spotifyDock{top:75px}body.game-mode #spotifyDock{top:82px;right:10px;width:280px;max-width:70vw}.game-title{font-size:9px;letter-spacing:3px}.hud{gap:6px;flex-wrap:wrap;max-width:48vw}.hud-card{min-width:72px;padding:7px 9px}.hud-value{font-size:16px}.game-controls{bottom:86px;max-width:95vw;overflow-x:auto}.game-btn{min-width:58px;font-size:10px}.help{font-size:8px;max-width:65vw}.guardrail.left{left:4%}.guardrail.right{right:4%}}
+</style>
+</head>
+<body>
+
+<section id="homeScreen" class="screen">
+  <div class="brand"><span>🚌</span><span>NH 48</span><span class="brand-dot"></span><span>BUS DRIVER</span></div>
+  <div class="top-menu">
+    <button class="btn menu-btn" onclick="focusMusic()">🎵 MUSIC</button>
+    <button class="btn menu-btn" onclick="showControls()">🎮 CONTROLS</button>
+  </div>
+  <aside class="road-sign">
+    <div class="road-sign-title">NH 48</div>
+    <div class="road-place"><span>दिल्ली</span><span class="distance">128 KM ↑</span></div>
+    <div class="road-place"><span>जयपुर</span><span class="distance">95 KM ↑</span></div>
+    <div class="road-place"><span>उदयपुर</span><span class="distance">312 KM ↑</span></div>
+  </aside>
+  <main class="home-content">
+    <div class="eyebrow">ALL NIGHT • NH 48 • LONG ROUTES</div>
+    <h1 class="hindi-title">बस ड्राइवर</h1>
+    <div class="english-title">BUS DRIVER</div>
+    <div class="tagline">पुराने गाने • लंबी सड़कें • रात का सफर</div>
+    <div class="route-line"><span class="route-text">🛣️ एक सफर • एक कहानी • 🚌</span></div>
+    <button class="drive-btn" onclick="startDriving()">🚌 &nbsp; DRIVE NOW</button>
+    <div class="creator-credit">BY — <span>SAKET KUMAR</span></div>
+  </main>
+</section>
+
+<div id="spotifyDock">
+  <div class="spotify-label">🎵 सफर के गाने • ROAD PLAYLIST</div>
+  <div class="spotify-player">
+    <iframe src="https://open.spotify.com/embed/playlist/3iYHVXAyUepzzNPKaGn3p1?utm_source=generator&theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="eager"></iframe>
+  </div>
+</div>
+
+<section id="gameScreen" class="screen hidden-screen">
+  <div class="game-sky-glow"></div>
+  <div class="mountain m1"></div><div class="mountain m2"></div><div class="mountain m3"></div>
+  <div class="tree-line"></div><div class="distant-city"></div>
+
+  <div class="indian-scene">
+    <div class="dhaba"><div class="dhaba-roof"></div><div class="dhaba-wall"></div><div class="dhaba-sign">गरमा गरम चाय ☕</div><i class="dhaba-lamp dl1"></i><i class="dhaba-lamp dl2"></i><i class="dhaba-lamp dl3"></i><i class="dhaba-lamp dl4"></i><i class="dhaba-lamp dl5"></i></div>
+    <div class="truck-far"><div class="truck-cargo"></div><div class="truck-cab"></div></div>
+    <div class="road-sign-mini"><div>दिल्ली ↑</div><div>जयपुर ↑</div><div>NH 48</div></div>
+    <div class="milestone"><span>NH 48</span><small>JAIPUR 95</small></div>
+  </div>
+
+  <div class="road"></div><div class="road-lines"></div>
+  <div class="guardrail left"></div><div class="guardrail right"></div>
+  <div class="reflector r1"></div><div class="reflector r2"></div><div class="reflector r3"></div><div class="reflector r4"></div><div class="reflector r5"></div><div class="reflector r6"></div>
+  <div class="street-lights"><span class="light l1"></span><span class="light l2"></span><span class="light l3"></span><span class="light l4"></span><span class="light l5"></span><span class="light l6"></span></div>
+
+  <div class="game-title">🛣️ NH 48 • BUS DRIVER • NIGHT ROUTE</div>
+  <div id="routePanel">
+    <div class="route-head"><span>📍 DELHI → JAIPUR</span><span id="routeNext">NEXT: GURGAON</span></div>
+    <div class="route-track"><div id="routeProgressFill"></div></div>
+    <div class="route-stops">
+      <span id="stop0" class="route-stop active">DELHI</span>
+      <span id="stop1" class="route-stop">GURGAON</span>
+      <span id="stop2" class="route-stop">MANESAR</span>
+      <span id="stop3" class="route-stop">NEEMRANA</span>
+      <span id="stop4" class="route-stop">JAIPUR</span>
+    </div>
+  </div>
+  <div class="hud">
+    <div class="hud-card"><div class="hud-label">SPEED</div><div class="hud-value" id="speed">0 KM/H</div></div>
+    <div class="hud-card"><div class="hud-label">DISTANCE</div><div class="hud-value" id="distance">0 M</div></div>
+    <div class="hud-card"><div class="hud-label">SCORE</div><div class="hud-value" id="score">0</div></div>
+    <div class="hud-card"><div class="hud-label">OVERTAKES</div><div class="hud-value" id="overtakes">0</div></div>
+    <div class="hud-card level-card"><div class="hud-label">LEVEL</div><div class="hud-value" id="level">EASY</div></div>
+    <div class="hud-card"><div class="hud-label">MULTIPLIER</div><div class="hud-value" id="multiplier">x1.0</div></div>
+  </div>
+
+  <div id="rewardPopup"></div>
+  <div id="progressPopup"></div>
+  <div id="routePopup"></div>
+  <div class="game-top-right"><button class="btn small-btn" onclick="goHome()">← HOME</button></div>
+  <div id="trafficLayer"></div>
+
+  <div id="playerBus" class="player-bus">
+    <img src="assets/bus2.png" alt="Player Bus">
+    <div class="bus-nameplate">SAKET TRAVELS</div>
+    <div class="bus-turn bt1"></div>
+    <div class="bus-turn bt2"></div>
+    <div class="headlight hl1"></div>
+    <div class="headlight hl2"></div>
+    <div class="bus-brake-glow"></div>
+  </div>
+
+  <div class="help">A / ← : LEFT &nbsp; | &nbsp; D / → : RIGHT &nbsp; | &nbsp; W : GAS &nbsp; | &nbsp; S : BRAKE &nbsp; | &nbsp; H : HORN &nbsp; | &nbsp; L : LIGHTS</div>
+  <div class="game-controls">
+    <button class="game-btn" data-control="left">← LEFT</button>
+    <button class="game-btn" data-control="gas">▲ GAS</button>
+    <button class="game-btn" data-control="brake">▼ BRAKE</button>
+    <button class="game-btn" data-control="right">RIGHT →</button>
+    <button class="game-btn" onclick="playHorn()">📢 HORN</button>
+    <button class="game-btn" onclick="toggleLights()">💡 LIGHTS</button>
+  </div>
+  <div class="mobile-controls">
+    <button class="mobile-circle" data-control="left">←</button>
+    <button class="mobile-circle" data-control="gas">▲</button>
+    <button class="mobile-circle" data-control="right">→</button>
+  </div>
+
+  <div id="routeCompleteOverlay" class="route-complete-overlay">
+    <div class="route-complete-card">
+      <h2>🏁 ROUTE COMPLETE!</h2>
+      <p>DELHI → JAIPUR completed on NH 48</p>
+      <div class="route-reward" id="routeCompleteScore">+0 ROUTE BONUS</div>
+      <p id="routeCompleteStats">Distance: 0 M • Score: 0</p>
+      <div class="crash-actions">
+        <button class="retry-btn" onclick="restartGame()">🔁 DRIVE AGAIN</button>
+        <button class="home-modal-btn" onclick="goHome()">← HOME</button>
+      </div>
+    </div>
+  </div>
+  <div id="crashOverlay" class="crash-overlay">
+    <div class="crash-card">
+      <h2>💥 CRASH!</h2><p>Your final distance</p>
+      <div class="final-distance" id="finalDistance">0 M</div>
+      <p id="finalScoreText">Final Score: 0</p>
+      <p id="finalLevelText">Level Reached: EASY</p>
+      <p id="bestDistanceText">Best Distance: 0 M</p>
+      <div class="crash-actions"><button class="retry-btn" onclick="restartGame()">🚌 DRIVE AGAIN</button><button class="home-modal-btn" onclick="goHome()">← HOME</button></div>
+    </div>
+  </div>
+</section>
+
+<audio id="horn1" src="assets/horn1.mp3" preload="auto"></audio>
+<audio id="horn2" src="assets/horn2.mp3" preload="auto"></audio>
+<audio id="horn3" src="assets/horn3.mp3" preload="auto"></audio>
+<audio id="horn4" src="assets/horn4.mp3" preload="auto"></audio>
+
+<script>
+const homeScreen=document.getElementById('homeScreen');
+const gameScreen=document.getElementById('gameScreen');
+const crashOverlay=document.getElementById('crashOverlay');
+const speedDisplay=document.getElementById('speed');
+const distanceDisplay=document.getElementById('distance');
+const scoreDisplay=document.getElementById('score');
+const overtakeDisplay=document.getElementById('overtakes');
+const levelDisplay=document.getElementById('level');
+const multiplierDisplay=document.getElementById('multiplier');
+const routeNext=document.getElementById('routeNext');
+const routeProgressFill=document.getElementById('routeProgressFill');
+const routePopup=document.getElementById('routePopup');
+const routeCompleteOverlay=document.getElementById('routeCompleteOverlay');
+const playerBus=document.getElementById('playerBus');
+const trafficLayer=document.getElementById('trafficLayer');
+
+let running=false,crashed=false,lastTime=0,gameLoopToken=0;
+let speed=0,distance=0,score=0,overtakes=0,nearMisses=0,combo=0;
+let playerX=50,playerVelocity=0,spawnTimer=0,traffic=[],rewardTimer=null;
+let progressionStage=-1,progressTimer=null;
+let routeIndex=0,routeCompleted=false,routePopupTimer=null;
+let bestDistance=Number(localStorage.getItem('nh48BestDistance')||0);
+let bestScore=Number(localStorage.getItem('nh48BestScore')||0);
+const keys={left:false,right:false,gas:false,brake:false};
+const lanes=[37,50,63];
+const MAX_SPEED=125;
+
+
+const routeStops=[
+  {name:'DELHI',distance:0,bonus:0,message:'START YOUR JOURNEY'},
+  {name:'GURGAON',distance:800,bonus:250,message:'CITY EXIT COMPLETE'},
+  {name:'MANESAR',distance:1800,bonus:500,message:'HIGHWAY CHECKPOINT'},
+  {name:'NEEMRANA',distance:3600,bonus:900,message:'MID ROUTE CLEARED'},
+  {name:'JAIPUR',distance:7000,bonus:2000,message:'DESTINATION REACHED'}
+];
+function showRoutePopup(stop,completed=false){
+  routePopup.innerHTML=completed
+    ? `<strong>🏁 ${stop.name} REACHED!</strong><span>${stop.message} • ROUTE BONUS +${stop.bonus}</span>`
+    : `<strong>📍 ${stop.name} CHECKPOINT</strong><span>${stop.message} • BONUS +${stop.bonus}</span>`;
+  routePopup.classList.remove('show'); void routePopup.offsetWidth; routePopup.classList.add('show');
+  clearTimeout(routePopupTimer);
+  routePopupTimer=setTimeout(()=>routePopup.classList.remove('show'),1800);
+}
+function updateRouteUI(){
+  const finalDistance=routeStops[routeStops.length-1].distance;
+  const percent=Math.min(100,(distance/finalDistance)*100);
+  routeProgressFill.style.width=percent+'%';
+
+  routeStops.forEach((stop,i)=>{
+    const el=document.getElementById('stop'+i);
+    if(!el)return;
+    el.classList.toggle('done',i<routeIndex);
+    el.classList.toggle('active',i===routeIndex && !routeCompleted);
+  });
+
+  if(routeCompleted){
+    routeNext.textContent='DESTINATION: JAIPUR ✓';
+  }else{
+    const next=routeStops[Math.min(routeIndex+1,routeStops.length-1)];
+    routeNext.textContent='NEXT: '+next.name+' • '+Math.max(0,Math.ceil(next.distance-distance))+' M';
+  }
+}
+function completeRoute(){
+  if(routeCompleted)return;
+  routeCompleted=true;
+  running=false;
+  speed=0;
+  const finalStop=routeStops[routeStops.length-1];
+  score+=finalStop.bonus;
+  updateHUD();
+  updateRouteUI();
+  showRoutePopup(finalStop,true);
+  setTimeout(()=>{
+    document.getElementById('routeCompleteScore').textContent='+'+finalStop.bonus+' ROUTE BONUS';
+    document.getElementById('routeCompleteStats').textContent='Distance: '+Math.floor(distance)+' M • Score: '+Math.floor(score)+' • Overtakes: '+overtakes;
+    routeCompleteOverlay.classList.add('show');
+  },650);
+}
+function updateRouteMission(){
+  if(routeCompleted){updateRouteUI();return;}
+  while(routeIndex<routeStops.length-1 && distance>=routeStops[routeIndex+1].distance){
+    routeIndex++;
+    const stop=routeStops[routeIndex];
+    if(stop.name==='JAIPUR'){completeRoute();return;}
+    score+=stop.bonus;
+    combo=0;
+    showRoutePopup(stop,false);
+  }
+  updateRouteUI();
+}
+
+const progressionStages=[
+  {name:'EASY',     title:'ROOKIE DRIVER',        start:0,    traffic:1.00, spawn:1.00, maxTraffic:5, score:1.00, drift:1.00, vehicle:'light'},
+  {name:'MEDIUM',   title:'HIGHWAY PRO',          start:1000, traffic:1.12, spawn:.86, maxTraffic:6, score:1.25, drift:1.20, vehicle:'mixed'},
+  {name:'HARD',     title:'NIGHT RUNNER',         start:3000, traffic:1.27, spawn:.72, maxTraffic:7, score:1.50, drift:1.45, vehicle:'heavy'},
+  {name:'EXTREME',  title:'NH 48 MASTER',         start:6000, traffic:1.42, spawn:.60, maxTraffic:8, score:2.00, drift:1.75, vehicle:'chaos'}
+];
+function getProgressStage(){
+  let index=0;
+  for(let i=0;i<progressionStages.length;i++){
+    if(distance>=progressionStages[i].start) index=i;
+  }
+  return {index,stage:progressionStages[index]};
+}
+function showProgress(stage){
+  const el=document.getElementById('progressPopup');
+  el.innerHTML=`<strong>${stage.name} UNLOCKED</strong><span>${stage.title} • SCORE x${stage.score.toFixed(2)}</span>`;
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  clearTimeout(progressTimer);
+  progressTimer=setTimeout(()=>el.classList.remove('show'),1800);
+}
+function updateProgression(){
+  const {index,stage}=getProgressStage();
+  if(index!==progressionStage){
+    progressionStage=index;
+    if(index>0) showProgress(stage);
+  }
+  return stage;
+}
+
+/* REAL IMAGE VEHICLE PROFILES
+   Uses only the uploaded transparent PNG assets.
+   The cargo pool uses only the approved cargo image. */
+const trafficProfiles=[
+  /* Balanced against the 108 x 196 player bus:
+     traffic is visible and realistic, but never larger than the player's bus. */
+  {kind:"bus",   extra:"bus",   images:["assets/bus1.png","assets/bus2.png"],   width:96, height:164,min:.64,max:.82,drift:.04,brain:"heavy", aggression:.24},
+  {kind:"car",   extra:"",      images:["assets/car1.png","assets/car2.png"],   width:84, height:136,min:.92,max:1.12,drift:.10,brain:"normal",aggression:.52},
+  {kind:"taxi",  extra:"taxi",  images:["assets/taxi1.png","assets/taxi2.png"], width:84, height:136,min:.90,max:1.10,drift:.11,brain:"fast",  aggression:.72},
+  {kind:"suv",   extra:"suv",   images:["assets/suv1.png","assets/suv2.png"],   width:90, height:144,min:.88,max:1.08,drift:.08,brain:"fast",  aggression:.64},
+  {kind:"cargo", extra:"cargo", images:["assets/cargo2.png"],                    width:100,height:160,min:.58,max:.74,drift:.03,brain:"heavy", aggression:.18}
+];
+
+function startDriving(){
+  document.body.classList.add('game-mode','driving');
+  homeScreen.classList.add('hidden-screen');
+  gameScreen.classList.remove('hidden-screen');
+  resetGame();
+  lastTime=performance.now();
+  const token=++gameLoopToken;
+  requestAnimationFrame(t=>gameLoop(t,token));
+}
+function goHome(){
+  gameLoopToken++;
+  running=false;crashed=false;
+  Object.keys(keys).forEach(k=>keys[k]=false);
+  document.body.classList.remove('game-mode','driving');
+  homeScreen.classList.remove('hidden-screen');
+  gameScreen.classList.add('hidden-screen');
+  crashOverlay.classList.remove('show');
+  routeCompleteOverlay.classList.remove('show');
+  routePopup.classList.remove('show');
+  clearTraffic();
+}
+function focusMusic(){document.getElementById('spotifyDock').scrollIntoView({behavior:'smooth',block:'center'})}
+function showControls(){alert('Controls:\\n\\nA / ← = Steer Left\\nD / → = Steer Right\\nW / ↑ = Accelerate\\nS / ↓ = Brake\\nH = Horn\\nL = Lights')}
+
+function resetGame(){
+  crashed=false;running=true;speed=0;distance=0;score=0;overtakes=0;nearMisses=0;combo=0;
+  playerX=50;playerVelocity=0;spawnTimer=.12;progressionStage=-1;routeIndex=0;routeCompleted=false;
+  clearTraffic();crashOverlay.classList.remove('show');routeCompleteOverlay.classList.remove('show');routePopup.classList.remove('show');
+  updateHUD();updatePlayer();
+}
+function restartGame(){
+  resetGame();lastTime=performance.now();
+  const token=++gameLoopToken;
+  requestAnimationFrame(t=>gameLoop(t,token));
+}
+function updateHUD(){
+  const stage=updateProgression();
+  speedDisplay.textContent=Math.round(speed)+' KM/H';
+  distanceDisplay.textContent=Math.floor(distance)+' M';
+  scoreDisplay.textContent=Math.floor(score);
+  overtakeDisplay.textContent=overtakes;
+  levelDisplay.textContent=stage.name;
+  multiplierDisplay.textContent='x'+stage.score.toFixed(2);
+  updateRouteMission();
+}
+function updatePlayer(){
+  playerX=Math.max(31,Math.min(69,playerX));
+  const lean=Math.max(-7,Math.min(7,playerVelocity*1.05));
+  const bounce=Math.sin(performance.now()/75)*(Math.min(speed,MAX_SPEED)/MAX_SPEED)*1.8;
+  playerBus.style.left=playerX+'%';
+  playerBus.style.transform=`translateX(-50%) translateY(${bounce}px) rotate(${lean}deg)`;
+
+  playerBus.classList.toggle('braking',keys.brake && speed>2);
+  playerBus.classList.toggle('signal-left',playerVelocity < -1.25);
+  playerBus.classList.toggle('signal-right',playerVelocity > 1.25);
+}
+
+/* FIXED SMOOTH HANDLING + PHYSICS */
+function updatePhysics(dt){
+  const s=Math.min(dt/1000,.05);
+
+  if(keys.gas) speed+=58*s;
+  else speed-=9*s;
+  if(keys.brake) speed-=145*s;
+  speed=Math.max(0,Math.min(MAX_SPEED,speed));
+
+  const steerInput=(keys.right?1:0)-(keys.left?1:0);
+  const targetVelocity=steerInput*(20+speed*.065);
+  const response=1-Math.pow(.001,s);
+  playerVelocity+=(targetVelocity-playerVelocity)*response;
+
+  if(!steerInput){
+    playerVelocity*=Math.max(0,1-7*s);
+    if(Math.abs(playerVelocity)<.02)playerVelocity=0;
+  }
+
+  playerX+=playerVelocity*s;
+  playerX=Math.max(31,Math.min(69,playerX));
+  if(playerX===31||playerX===69) playerVelocity*=.45;
+
+  distance+=speed*s*.34;
+  const stage=getProgressStage().stage;
+  score+=speed*s*.055*stage.score;
+  updatePlayer();updateHUD();
+}
+
+function showReward(message){
+  const el=document.getElementById('rewardPopup');
+  el.textContent=message;el.classList.remove('show');
+  void el.offsetWidth;el.classList.add('show');
+  clearTimeout(rewardTimer);
+  rewardTimer=setTimeout(()=>el.classList.remove('show'),900);
+}
+function addScore(points,message){
+  score+=points;showReward(message);updateHUD();
+}
+
+
+/* =====================================
+   ROAD-BOUND LANE TRAFFIC SYSTEM
+   All traffic stays on the same road and can change lanes
+===================================== */
+/* Free-position perspective traffic.
+   Vehicles use a normalized road position (u: 0=left edge, 1=right edge),
+   not three fixed screen lanes. Their X is recalculated from the road width
+   at every Y position, so the whole visible road can be occupied naturally. */
+function getTrafficFlow(){
+  const stage=getProgressStage().stage;
+
+  /* Real difficulty separation.
+     EASY starts with breathing room; higher levels increase density and pressure. */
+  const flow={
+    EASY:{min:2,target:3,max:5,interval:1.35,clusterChance:.03,ai:.38},
+    MEDIUM:{min:4,target:5,max:7,interval:.90,clusterChance:.10,ai:.65},
+    HARD:{min:6,target:7,max:9,interval:.62,clusterChance:.20,ai:.88},
+    EXTREME:{min:8,target:9,max:12,interval:.42,clusterChance:.32,ai:1.12}
+  };
+  return {...flow[stage.name],stage};
+}
+
+/* Match the visible trapezoid road: narrow at the horizon, wide near player. */
+function getRoadBounds(y){
+  const p=Math.max(0,Math.min(1,(y-10)/90));
+  const left=42-(24*p);
+  const right=58+(24*p);
+  return {left,right,p};
+}
+function roadUToX(u,y){
+  const b=getRoadBounds(y);
+  return b.left+(b.right-b.left)*u;
+}
+function roadPaddingForY(y){
+  /* Keep vehicle centres inside the road edges as perspective grows. */
+  const b=getRoadBounds(y);
+  const roadWidth=b.right-b.left;
+  return Math.min(.18,Math.max(.075,3.8/roadWidth));
+}
+function randomRoadU(y,ignoreVehicle=null){
+  const pad=roadPaddingForY(y);
+  const candidates=[];
+  for(let i=0;i<16;i++){
+    const u=pad+Math.random()*(1-pad*2);
+    const blocked=traffic.some(o=>{
+      if(o===ignoreVehicle)return false;
+      return Math.abs(o.y-y)<24 && Math.abs(o.u-u)<.16;
+    });
+    if(!blocked)candidates.push(u);
+  }
+  if(candidates.length)return candidates[Math.floor(Math.random()*candidates.length)];
+
+  /* Fallback: choose the least crowded horizontal sector. */
+  let bestU=.5,bestScore=-Infinity;
+  for(let i=0;i<9;i++){
+    const u=pad+(1-pad*2)*(i/8);
+    let nearest=Infinity;
+    traffic.forEach(o=>{
+      const score=Math.abs(o.u-u)*100+Math.abs(o.y-y)*.35;
+      nearest=Math.min(nearest,score);
+    });
+    if(nearest>bestScore){bestScore=nearest;bestU=u;}
+  }
+  return bestU;
+}
+function vehicleSpeedGap(v,other){
+  /* Positive = other is ahead of v on screen. */
+  return other.y-v.y;
+}
+function isRoadPositionClear(u,y,ignore=null,gapY=18,gapU=.14){
+  return !traffic.some(o=>o!==ignore && Math.abs(o.y-y)<gapY && Math.abs(o.u-u)<gapU);
+}
+function chooseIntelligentTarget(v,reason='wander'){
+  const pad=roadPaddingForY(v.y);
+  const options=[];
+  const shifts=[-.30,-.22,-.15,.15,.22,.30];
+  shifts.forEach(shift=>{
+    const target=Math.max(pad,Math.min(1-pad,v.u+shift));
+    if(isRoadPositionClear(target,v.y,v,18,.14))options.push(target);
+  });
+  if(!options.length)return false;
+
+  /* Fast traffic prefers a decisive move; heavy vehicles stay conservative. */
+  if(reason==='avoid' || reason==='cutin'){
+    options.sort((a,b)=>Math.abs(b-v.u)-Math.abs(a-v.u));
+  }else if(v.aggression<.35){
+    options.sort((a,b)=>Math.abs(a-v.u)-Math.abs(b-v.u));
+  }
+  v.laneStartU=v.u;
+  v.targetU=options[Math.floor(Math.random()*Math.min(options.length,reason==='avoid'?2:options.length))];
+  v.lateralProgress=0;
+  v.changing=true;
+  v.changeReason=reason;
+  return true;
+}
+function spawnTrafficBatch(){
+  const flow=getTrafficFlow();
+  if(traffic.length>=flow.max)return 0;
+  let count=1;
+  if(traffic.length<flow.target && Math.random()<flow.clusterChance)count=2;
+  count=Math.min(count,flow.max-traffic.length);
+  let spawned=0;
+  for(let i=0;i<count;i++){
+    if(spawnTrafficAtRoadPosition(-10-i*18))spawned++;
+  }
+  return spawned;
+}
+function spawnTrafficAtRoadPosition(y=-10){
+  const stage=getProgressStage().stage;
+  let pool=trafficProfiles;
+  if(stage.vehicle==='light'){
+    pool=trafficProfiles.filter(p=>['car','taxi','suv'].includes(p.kind));
+  }else if(stage.vehicle==='mixed'){
+    pool=trafficProfiles.filter(p=>p.kind!=='cargo');
+  }else if(stage.vehicle==='heavy'){
+    pool=trafficProfiles.filter(p=>['car','taxi','suv','cargo','bus'].includes(p.kind));
+  }
+
+  const profile=pool[Math.floor(Math.random()*pool.length)];
+  const image=profile.images[Math.floor(Math.random()*profile.images.length)];
+  const u=randomRoadU(y);
+  const el=document.createElement('div');
+  el.className='traffic dense '+profile.kind+(profile.extra?' '+profile.extra:'');
+  el.innerHTML='<img class="vehicle-image" src="'+image+'" alt="">';
+  trafficLayer.appendChild(el);
+
+  const cruise=profile.min+Math.random()*(profile.max-profile.min);
+  traffic.push({
+    el,image,u,targetU:u,laneStartU:u,lateralProgress:1,y,
+    width:profile.width,height:profile.height,
+    speedFactor:cruise,baseSpeedFactor:cruise,
+    desiredSpeedFactor:cruise,aggression:profile.aggression,brain:profile.brain,
+    laneChangeTimer:1.5+Math.random()*3.5,
+    decisionTimer:.35+Math.random()*.8,
+    following:null,followingTimer:0,
+    changing:false,changeReason:'',
+    cutInCooldown:4+Math.random()*6,
+    passedPlayer:false,overtakeAwarded:false,nearMissAwarded:false
+  });
+  return true;
+}
+function spawnTraffic(){return spawnTrafficBatch();}
+
+function updateTraffic(dt){
+  const s=Math.min(dt/1000,.05);
+  spawnTimer-=s;
+  const flow=getTrafficFlow();
+  const difficulty=Math.min(1.18,1+distance/14000)*flow.stage.traffic;
+  const speedFactor=Math.max(.70,1-speed/330);
+  const spawnInterval=Math.max(.36,flow.interval*speedFactor);
+
+  if(speed>8 && spawnTimer<=0){
+    if(traffic.length<flow.target){
+      spawnTrafficBatch();
+      spawnTimer=spawnInterval*(.82+Math.random()*.25);
+    }else if(traffic.length<flow.max && Math.random()<.35){
+      spawnTrafficBatch();
+      spawnTimer=spawnInterval*(1+Math.random()*.30);
+    }else spawnTimer=spawnInterval*.6;
+  }
+
+  /* ---------- INTELLIGENCE PASS ---------- */
+  for(const v of traffic){
+    v.decisionTimer-=s;
+    v.cutInCooldown-=s;
+    if(v.decisionTimer>0)continue;
+    v.decisionTimer=.30+Math.random()*.55;
+
+    let leader=null,leaderGap=Infinity;
+    for(const o of traffic){
+      if(o===v)continue;
+      const gap=vehicleSpeedGap(v,o);
+      if(gap>0&&gap<28&&Math.abs(o.u-v.u)<.13&&gap<leaderGap){leader=o;leaderGap=gap;}
+    }
+
+    if(leader){
+      /* Car-following: slow down before rear-ending the vehicle ahead. */
+      const safeGap=v.brain==='heavy'?15:11;
+      const urgency=Math.max(0,(safeGap-leaderGap)/safeGap);
+      const leaderLimit=Math.max(.45,leader.speedFactor-.03);
+      v.desiredSpeedFactor=Math.min(v.baseSpeedFactor,leaderLimit*(1-urgency*.35));
+      v.following=leader;
+
+      /* If blocked, try an actual free lane rather than blindly stacking. */
+      if(!v.changing && leaderGap<safeGap && Math.random()<(.12+v.aggression*.30)*flow.ai){
+        chooseIntelligentTarget(v,'avoid');
+      }
+    }else{
+      v.following=null;
+      /* Recover smoothly to personal cruise speed. */
+      v.desiredSpeedFactor=v.baseSpeedFactor;
+      if(!v.changing && Math.random()<(.03+v.aggression*.06)*flow.ai)chooseIntelligentTarget(v,'wander');
+    }
+
+    /* Occasional aggressive cut-in by fast cars, only if the destination is clear. */
+    if(!v.changing && flow.ai>=.60 && v.brain==='fast' && v.y>24 && v.y<72 && v.cutInCooldown<=0 && Math.random()<.16*flow.ai){
+      if(chooseIntelligentTarget(v,'cutin'))v.cutInCooldown=5+Math.random()*7;
+    }
+  }
+
+  /* ---------- MOVEMENT + COLLISION PASS ---------- */
+  for(let i=traffic.length-1;i>=0;i--){
+    const v=traffic[i];
+    v.speedFactor+=(v.desiredSpeedFactor-v.speedFactor)*Math.min(1,s*1.8);
+    const approachSpeed=15+speed*.50*v.speedFactor*difficulty;
+    v.y+=approachSpeed*s;
+
+    v.laneChangeTimer-=s;
+    if(v.laneChangeTimer<=0){
+      if(!v.changing && Math.random()<(.08+v.aggression*.18)*flow.ai)chooseIntelligentTarget(v,'wander');
+      v.laneChangeTimer=2.2+Math.random()*4.4;
+    }
+
+    if(v.changing){
+      const lateralRate=v.changeReason==='cutin' ? .95 : (v.brain==='heavy' ? .38 : .62+v.aggression*.35);
+      v.lateralProgress=Math.min(1,v.lateralProgress+s*lateralRate);
+      const t=v.lateralProgress*v.lateralProgress*(3-2*v.lateralProgress);
+      v.u=v.laneStartU+(v.targetU-v.laneStartU)*t;
+      if(v.lateralProgress>=1){v.u=v.targetU;v.changing=false;v.changeReason='';}
+    }
+
+    const pad=roadPaddingForY(v.y);
+    v.u=Math.max(pad,Math.min(1-pad,v.u));
+    const x=roadUToX(v.u,v.y);
+    /* Balanced perspective:
+       far vehicles stay small, middle vehicles are clearly visible,
+       and near vehicles grow naturally without becoming oversized. */
+    const p=Math.max(0,Math.min(1,(v.y-5)/105));
+    // Larger, game-readable traffic while keeping perspective believable.
+    // Far vehicles are visible; mid/near vehicles feel substantial without
+    // becoming larger than the player's bus.
+    const scale=.55+p*.65;
+    v.el.style.left=x+'%';v.el.style.top=v.y+'%';
+    v.el.style.width=(v.width*scale)+'px';v.el.style.height=(v.height*scale)+'px';
+    v.el.style.transform='translateX(-50%)';
+
+    if(!v.passedPlayer&&v.y>=84)v.passedPlayer=true;
+    if(v.passedPlayer&&!v.overtakeAwarded&&v.y>=98){
+      v.overtakeAwarded=true;overtakes++;combo=Math.min(combo+1,5);
+      const pts=Math.round(100*combo*flow.stage.score);
+      addScore(pts,combo>1?`🔥 OVERTAKE +${pts} COMBO x${combo}`:`🚗 OVERTAKE +${pts}`);
+    }
+
+    if(!v.nearMissAwarded&&v.y>63&&v.y<88){
+      const dx=Math.abs(x-playerX);
+      if(dx>4.2&&dx<7.5){
+        v.nearMissAwarded=true;nearMisses++;
+        const nearPts=Math.round(50*flow.stage.score);
+        addScore(nearPts,`⚡ NEAR MISS +${nearPts}`);
+      }
+    }
+
+    if(v.y>110){v.el.remove();traffic.splice(i,1);continue;}
+
+    /* REAL VISUAL COLLISION: transparent PNG margins should not cause early crashes */
+    if(v.y>68&&v.y<96){
+      const busRect=playerBus.getBoundingClientRect();
+      const vehicleRect=v.el.getBoundingClientRect();
+
+      const busHit={
+        left:busRect.left+busRect.width*.30,
+        right:busRect.right-busRect.width*.30,
+        top:busRect.top+busRect.height*.42,
+        bottom:busRect.bottom-busRect.height*.10
+      };
+
+      const vehicleHit={
+        left:vehicleRect.left+vehicleRect.width*.32,
+        right:vehicleRect.right-vehicleRect.width*.32,
+        top:vehicleRect.top+vehicleRect.height*.34,
+        bottom:vehicleRect.bottom-vehicleRect.height*.12
+      };
+
+      const collided=
+        busHit.left<vehicleHit.right&&
+        busHit.right>vehicleHit.left&&
+        busHit.top<vehicleHit.bottom&&
+        busHit.bottom>vehicleHit.top;
+
+      if(collided){crashGame();return;}
+    }
+  }
+}
+function clearTraffic(){
+  traffic.forEach(v=>v.el.remove());
+  traffic=[];
+}
+function gameLoop(t,token){
+  if(token!==gameLoopToken||!running||crashed)return;
+  const dt=Math.min(t-lastTime,50);
+  lastTime=t;
+  updatePhysics(dt);
+  updateTraffic(dt);
+  if(running&&!crashed&&token===gameLoopToken)requestAnimationFrame(next=>gameLoop(next,token));
+}
+function crashGame(){
+  if(crashed)return;
+  crashed=true;running=false;speed=0;
+  if(score>bestScore){
+    bestScore=Math.floor(score);
+    localStorage.setItem('nh48BestScore',bestScore);
+  }
+  const f=Math.floor(distance);
+  if(f>bestDistance){
+    bestDistance=f;
+    localStorage.setItem('nh48BestDistance',bestDistance);
+  }
+  const stage=getProgressStage().stage;
+  document.getElementById('finalDistance').textContent=f+' M';
+  document.getElementById('finalScoreText').textContent='Final Score: '+Math.floor(score);
+  document.getElementById('finalLevelText').textContent='Level Reached: '+stage.name+' • '+stage.title;
+  document.getElementById('bestDistanceText').textContent='Best Distance: '+bestDistance+' M';
+  crashOverlay.classList.add('show');
+}
+
+/* INPUT */
+function setKey(k,v){
+  if(k==='a'||k==='arrowleft')keys.left=v;
+  if(k==='d'||k==='arrowright')keys.right=v;
+  if(k==='w'||k==='arrowup')keys.gas=v;
+  if(k==='s'||k==='arrowdown')keys.brake=v;
+}
+document.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if(['a','d','w','s','arrowleft','arrowright','arrowup','arrowdown','h','l'].includes(k))e.preventDefault();
+  if(!e.repeat&&k==='h')playHorn();
+  if(!e.repeat&&k==='l')toggleLights();
+  setKey(k,true);
+});
+document.addEventListener('keyup',e=>setKey(e.key.toLowerCase(),false));
+window.addEventListener('blur',()=>Object.keys(keys).forEach(k=>keys[k]=false));
+
+document.querySelectorAll('[data-control]').forEach(b=>{
+  const c=b.dataset.control;
+  const down=e=>{e.preventDefault();keys[c]=true;b.classList.add('active')};
+  const up=e=>{e.preventDefault();keys[c]=false;b.classList.remove('active')};
+  b.addEventListener('pointerdown',down);
+  b.addEventListener('pointerup',up);
+  b.addEventListener('pointerleave',up);
+  b.addEventListener('pointercancel',up);
+});
+
+function toggleLights(){document.body.classList.toggle('lights-on')}
+const hornIds=['horn1','horn2','horn3','horn4'];
+let lastHorn=-1;
+function playHorn(){
+  let i;
+  do{i=Math.floor(Math.random()*hornIds.length)}while(hornIds.length>1&&i===lastHorn);
+  lastHorn=i;
+  const h=document.getElementById(hornIds[i]);
+  h.pause();h.currentTime=0;h.play().catch(()=>{});
+
+  playerBus.classList.remove('horn-active');
+  void playerBus.offsetWidth;
+  playerBus.classList.add('horn-active');
+  setTimeout(()=>playerBus.classList.remove('horn-active'),650);
+}
+</script>
+</body>
+</html>
