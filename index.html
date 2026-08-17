@@ -19,7 +19,7 @@ body{color:#fff;font-family:"Noto Sans Devanagari",Arial,sans-serif}
 .btn:hover{transform:translateY(-2px);border-color:rgba(255,205,102,.85)}
 
 /* HOME */
-#homeScreen{z-index:1;background:linear-gradient(rgba(0,0,0,.34),rgba(0,0,0,.72)),url("bus-bg.png") center/cover no-repeat;transition:.55s}
+#homeScreen{z-index:1;background:linear-gradient(rgba(0,0,0,.34),rgba(0,0,0,.72)),url("assets/bus-bg.png") center/cover no-repeat;transition:.55s}
 #homeScreen:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,rgba(255,136,30,.07),rgba(0,0,0,.12) 45%,rgba(0,0,0,.58) 100%)}
 .brand{position:absolute;top:28px;left:5%;z-index:8;display:flex;align-items:center;gap:10px;font-family:"Oswald",sans-serif;font-size:14px;font-weight:600;letter-spacing:3px;color:#f6e3bd;text-transform:uppercase}
 .brand-dot{width:5px;height:5px;border-radius:50%;background:var(--gold)}
@@ -79,7 +79,6 @@ body.driving .road-lines:before{animation-play-state:running}
 .hud-label{font-family:"Oswald",sans-serif;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.58)}
 .hud-value{margin-top:3px;font-family:"Oswald",sans-serif;font-size:22px;color:#f7d17b}
 .game-top-right{position:absolute;right:18px;top:18px;z-index:50}.small-btn{padding:9px 16px;font-size:11px}
-.damage-meter{position:absolute;top:18px;right:112px;z-index:52;display:flex;gap:5px;padding:8px 10px;border:1px solid rgba(255,204,110,.28);border-radius:999px;background:rgba(8,12,15,.72);font-family:"Oswald",sans-serif;letter-spacing:1px;font-size:11px;backdrop-filter:blur(8px)}.damage-pip{width:10px;height:10px;border-radius:50%;background:#ffc75f;box-shadow:0 0 10px rgba(255,199,95,.45);transition:.2s}.damage-pip.lost{background:#3a3d40;box-shadow:none}.damage-hit-flash{animation:damageFlash .34s ease-out}@keyframes damageFlash{0%{filter:brightness(1)}25%{filter:brightness(1.65) saturate(1.35)}100%{filter:brightness(1)}}
 
 /* PLAYER BUS — REAL IMAGE + CUSTOM NAME + VISIBLE LIGHTS */
 .player-bus{
@@ -93,7 +92,6 @@ body.driving .road-lines:before{animation-play-state:running}
   filter:drop-shadow(0 20px 20px rgba(0,0,0,.62));
   will-change:left,transform;
   transform-origin:50% 90%;
-  contain:layout paint style;
 }
 .player-bus img{
   position:absolute;
@@ -323,129 +321,74 @@ body.game-mode #gameScreen{opacity:1;visibility:visible;pointer-events:auto}
     }
   }
 
-/* =========================
-   V2 PERFORMANCE + MOBILE GAME FIX
-   ========================= */
-:root{--mobile-road-top-left:34%;--mobile-road-top-right:66%}
-@media (max-width: 800px){
-  /* Home: keep it clean and avoid expensive blur compositing */
-  #spotifyDock{width:88vw;max-width:360px;top:94px}
-  .spotify-player,.spotify-player iframe{height:136px}
-  .brand{top:16px;left:24px;font-size:10px;letter-spacing:2px}
-  .top-menu{top:14px;right:14px;gap:6px}
-  .menu-btn{padding:8px 11px;font-size:10px}
-  .home-content{padding:210px 18px 40px;justify-content:center}
-  .eyebrow{font-size:8px;letter-spacing:3px}
-  .hindi-title{font-size:clamp(52px,16vw,76px);letter-spacing:-2px}
-  .english-title{font-size:clamp(46px,13vw,62px)}
-  .tagline{font-size:11px;margin-top:9px}
-  .route-line{margin:9px auto 7px}
-  .route-text{font-size:9px}
-  .drive-btn{min-width:190px;padding:13px 24px;font-size:16px}
-  .creator-credit{font-size:9px}
 
-  /* GAME: hide expensive embed while driving on small screens */
+/* =========================
+   FINAL RESPONSIVE + PERFORMANCE FIX
+   Desktop keeps original handling. Mobile gets its own tuned handling.
+   ========================= */
+html,body,#homeScreen,#gameScreen{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+@media (max-width:768px){
+  #gameScreen{contain:layout paint size}
+  .game-title{top:14px;font-size:9px;letter-spacing:3px;white-space:nowrap}
+  .hud{top:42px;left:20px;right:20px;max-width:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .hud-card{min-width:0;padding:8px 9px;border-radius:14px}
+  .hud-label{font-size:8px;letter-spacing:1.6px}
+  .hud-value{font-size:17px;white-space:nowrap}
+  .hud-card:nth-child(3),.hud-card:nth-child(4),.hud-card:nth-child(6){display:none}
+  .level-card .hud-value{font-size:16px}
+
+  .game-top-right{top:128px;right:18px}
+  .small-btn{padding:9px 14px;font-size:10px}
+
+  #routePanel{top:176px;width:calc(100% - 40px);padding:9px 11px;border-radius:15px;background:rgba(8,12,15,.84)}
+  .route-head{font-size:10px;letter-spacing:1px}
+  #routeNext{font-size:13px}
+  .route-stops{font-size:7px}
+  .route-track{margin:8px 2px 7px}
+
   body.game-mode #spotifyDock{display:none}
 
-  /* Wider mobile road and shorter horizon */
-  .road{
-    width:112vw;
-    height:84%;
-    bottom:-4%;
-    clip-path:polygon(34% 0%,66% 0%,100% 100%,0 100%);
-    box-shadow:none;
-  }
-  .road:before{opacity:.14}
-  .road-lines{width:12px;height:90%;bottom:-8%}
-  .road-lines:before{width:7px;animation-duration:.9s}
-  .guardrail{opacity:.72}
-  .street-lights .light{box-shadow:0 0 10px 3px rgba(255,174,69,.28)}
-  .reflector{width:8px;height:8px;box-shadow:0 0 8px 3px rgba(255,192,70,.45);animation:none}
-  body.driving .indian-scene{animation:none}
+  .game-sky-glow{top:14%;width:94px;height:94px;opacity:.88}
+  .road{width:112vw;height:84%;bottom:-3%;clip-path:polygon(42% 0%,58% 0%,96% 100%,4% 100%)}
+  .road-lines{height:90%;width:12px;bottom:-8%}
+  .guardrail{height:80%;bottom:-4%;opacity:.78}
+  .guardrail.left{left:7%;transform:rotate(-27deg)}
+  .guardrail.right{right:7%;transform:rotate(27deg)}
+  .tree-line{height:55%}
+  .street-lights .light{transform:scale(.88)}
 
-  /* Smaller player bus, clearly visible above controls */
-  .player-bus{
-    width:96px;
-    height:142px;
-    bottom:15%;
-    filter:drop-shadow(0 10px 10px rgba(0,0,0,.5));
-  }
-  .bus-nameplate{min-width:54px;font-size:5px;padding:2px 4px 3px}
-  .player-bus .headlight{width:10px;height:5px;box-shadow:0 0 6px 2px rgba(255,184,30,.8)}
-  .player-bus .bus-turn{width:5px;height:5px}
+  /* Smaller player bus so it does not dominate the screen */
+  .player-bus{width:112px;height:165px;bottom:11.5%}
+  .bus-nameplate{min-width:64px;font-size:6px;padding:3px 5px 4px}
+  .player-bus .headlight{width:11px;height:6px}
+  body.lights-on .player-bus:after{width:190px;height:130px}
 
-  /* Top HUD: compact, no backdrop blur */
-  .game-title{top:12px;font-size:8px;letter-spacing:2.4px;white-space:nowrap}
-  .hud{
-    top:34px;left:10px;right:10px;max-width:none;
-    display:grid;grid-template-columns:repeat(3,1fr);gap:5px;
-  }
-  .hud-card{
-    min-width:0;padding:6px 7px;border-radius:10px;
-    background:rgba(8,12,15,.82);
-    backdrop-filter:none;
-  }
-  .hud-card:nth-child(3),.hud-card:nth-child(4),.hud-card:nth-child(6){display:none}
-  .hud-label{font-size:7px;letter-spacing:1.2px}
-  .hud-value{font-size:15px}
-  .level-card .hud-value{font-size:15px}
-  .game-top-right{top:88px;right:10px}
-  .damage-meter{top:14px;right:12px;padding:6px 8px;gap:4px}.damage-pip{width:8px;height:8px}
-  .small-btn{padding:7px 11px;font-size:9px}
-
-  /* Route panel stays readable and does not block road */
-  #routePanel{
-    top:126px;width:calc(100vw - 20px);padding:7px 9px;border-radius:12px;
-    background:rgba(8,12,15,.86);backdrop-filter:none;
-  }
-  .route-head{font-size:8px}
-  #routeNext{font-size:11px}
-  .route-track{height:5px;margin:6px 2px}
-  .route-stops{font-size:6px}
-
-  /* Bottom controls: 2 x 3, no horizontal scrolling */
-  .game-controls{
-    left:10px;right:10px;bottom:14px;transform:none;
-    display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
-    max-width:none;padding:7px;border-radius:16px;
-    background:rgba(9,13,15,.90);backdrop-filter:none;
-  }
-  .game-btn{
-    min-width:0;min-height:46px;padding:8px 4px;font-size:9px;
-    letter-spacing:.6px;border-radius:10px;
-  }
-  .mobile-controls{display:none}
+  /* One control system only: compact 3x2 grid, no duplicate circle controls */
+  .mobile-controls{display:none!important}
+  .game-controls{left:18px;right:18px;bottom:18px;transform:none;width:auto;max-width:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:8px;border-radius:18px;overflow:visible;background:rgba(8,12,15,.88);backdrop-filter:blur(8px)}
+  .game-btn{min-width:0;width:100%;height:54px;padding:8px 5px;font-size:11px;letter-spacing:.6px;border-radius:12px;white-space:nowrap}
   .help{display:none}
 
-  /* Remove high-cost effects */
-  .traffic{filter:drop-shadow(0 5px 7px rgba(0,0,0,.42))}
-  #progressPopup,#routePopup,.crash-overlay,.route-complete-overlay{backdrop-filter:none}
-  .game-sky-glow{box-shadow:0 0 22px 8px rgba(255,166,47,.28)}
+  /* Reduce decorative animation cost on phones */
+  body.driving .indian-scene{animation:none}
+  .reflector{box-shadow:0 0 10px 3px rgba(255,192,70,.55)}
 }
 
-/* Small phones */
-@media (max-width: 420px){
-  .player-bus{width:90px;height:132px;bottom:15.5%}
-  .game-controls{bottom:10px}
-  .game-btn{min-height:44px;font-size:8px}
+@media (max-width:420px){
+  .hud{left:14px;right:14px;gap:6px}
+  .game-top-right{right:14px}
+  #routePanel{width:calc(100% - 28px);top:172px}
+  .game-controls{left:12px;right:12px;bottom:14px;gap:7px;padding:7px}
+  .game-btn{height:50px;font-size:10px}
+  .player-bus{width:104px;height:154px;bottom:11.8%}
 }
 
-</style>
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
 
-<style>
-/* FINAL MOBILE SPOTIFY COMPACT FIX */
-@media (max-width:800px){
-  #spotifyDock{top:82px;width:86vw;max-width:350px}
-  .spotify-label{margin-bottom:5px;font-size:9px;letter-spacing:3px}
-  .spotify-player{height:108px;border-radius:16px}
-  .spotify-player iframe{height:152px}
-  .home-content{padding-top:184px}
-}
-@media (max-width:430px){
-  #spotifyDock{top:80px;width:86vw;max-width:340px}
-  .spotify-player{height:104px}
-  .home-content{padding-top:178px}
-}
 </style>
 </head>
 <body>
@@ -476,7 +419,7 @@ body.game-mode #gameScreen{opacity:1;visibility:visible;pointer-events:auto}
 <div id="spotifyDock">
   <div class="spotify-label">🎵 सफर के गाने • ROAD PLAYLIST</div>
   <div class="spotify-player">
-    <iframe src="https://open.spotify.com/embed/playlist/3iYHVXAyUepzzNPKaGn3p1?utm_source=generator&theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <iframe src="https://open.spotify.com/embed/playlist/3iYHVXAyUepzzNPKaGn3p1?utm_source=generator&theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="eager"></iframe>
   </div>
 </div>
 
@@ -521,12 +464,11 @@ body.game-mode #gameScreen{opacity:1;visibility:visible;pointer-events:auto}
   <div id="rewardPopup"></div>
   <div id="progressPopup"></div>
   <div id="routePopup"></div>
-  <div id="damageMeter" class="damage-meter" aria-label="Damage"><span class="damage-pip"></span><span class="damage-pip"></span><span class="damage-pip"></span></div>
   <div class="game-top-right"><button class="btn small-btn" onclick="goHome()">← HOME</button></div>
   <div id="trafficLayer"></div>
 
   <div id="playerBus" class="player-bus">
-    <img src="bus2.png" alt="Player Bus">
+    <img src="assets/bus2.png" alt="Player Bus">
     <div class="bus-nameplate">SAKET TRAVELS</div>
     <div class="bus-turn bt1"></div>
     <div class="bus-turn bt2"></div>
@@ -574,10 +516,10 @@ body.game-mode #gameScreen{opacity:1;visibility:visible;pointer-events:auto}
   </div>
 </section>
 
-<audio id="horn1" src="horn1.mp3" preload="auto"></audio>
-<audio id="horn2" src="horn2.mp3" preload="auto"></audio>
-<audio id="horn3" src="horn3.mp3" preload="auto"></audio>
-<audio id="horn4" src="horn4.mp3" preload="auto"></audio>
+<audio id="horn1" src="assets/horn1.mp3" preload="auto"></audio>
+<audio id="horn2" src="assets/horn2.mp3" preload="auto"></audio>
+<audio id="horn3" src="assets/horn3.mp3" preload="auto"></audio>
+<audio id="horn4" src="assets/horn4.mp3" preload="auto"></audio>
 
 <script>
 const homeScreen=document.getElementById('homeScreen');
@@ -596,10 +538,8 @@ const routeCompleteOverlay=document.getElementById('routeCompleteOverlay');
 const playerBus=document.getElementById('playerBus');
 const trafficLayer=document.getElementById('trafficLayer');
 
-const IS_MOBILE=window.matchMedia('(max-width: 800px)').matches;
-let running=false,crashed=false,lastTime=0,gameLoopToken=0,hudAccumulator=0;
+let running=false,crashed=false,lastTime=0,gameLoopToken=0;
 let speed=0,distance=0,score=0,overtakes=0,nearMisses=0,combo=0;
-let damage=0,invincibleUntil=0;
 let playerX=50,playerVelocity=0,spawnTimer=0,traffic=[],rewardTimer=null;
 let progressionStage=-1,progressTimer=null;
 let routeIndex=0,routeCompleted=false,routePopupTimer=null;
@@ -708,11 +648,11 @@ function updateProgression(){
 const trafficProfiles=[
   /* Balanced against the 108 x 196 player bus:
      traffic is visible and realistic, but never larger than the player's bus. */
-  {kind:"bus",   extra:"bus",   images:["bus1.png","bus2.png"],   width:96, height:164,min:.64,max:.82,drift:.04,brain:"heavy", aggression:.24},
-  {kind:"car",   extra:"",      images:["car1.png","car2.png"],   width:84, height:136,min:.92,max:1.12,drift:.10,brain:"normal",aggression:.52},
-  {kind:"taxi",  extra:"taxi",  images:["taxi1.png","taxi2.png"], width:84, height:136,min:.90,max:1.10,drift:.11,brain:"fast",  aggression:.72},
-  {kind:"suv",   extra:"suv",   images:["suv1.png","suv2.png"],   width:90, height:144,min:.88,max:1.08,drift:.08,brain:"fast",  aggression:.64},
-  {kind:"cargo", extra:"cargo", images:["cargo2.png"],            width:100,height:160,min:.58,max:.74,drift:.03,brain:"heavy", aggression:.18}
+  {kind:"bus",   extra:"bus",   images:["assets/bus1.png","assets/bus2.png"],   width:96, height:164,min:.64,max:.82,drift:.04,brain:"heavy", aggression:.24},
+  {kind:"car",   extra:"",      images:["assets/car1.png","assets/car2.png"],   width:84, height:136,min:.92,max:1.12,drift:.10,brain:"normal",aggression:.52},
+  {kind:"taxi",  extra:"taxi",  images:["assets/taxi1.png","assets/taxi2.png"], width:84, height:136,min:.90,max:1.10,drift:.11,brain:"fast",  aggression:.72},
+  {kind:"suv",   extra:"suv",   images:["assets/suv1.png","assets/suv2.png"],   width:90, height:144,min:.88,max:1.08,drift:.08,brain:"fast",  aggression:.64},
+  {kind:"cargo", extra:"cargo", images:["assets/cargo2.png"],                    width:100,height:160,min:.58,max:.74,drift:.03,brain:"heavy", aggression:.18}
 ];
 
 function startDriving(){
@@ -743,7 +683,6 @@ function resetGame(){
   crashed=false;running=true;speed=0;distance=0;score=0;overtakes=0;nearMisses=0;combo=0;
   playerX=50;playerVelocity=0;spawnTimer=.12;hudAccumulator=0;progressionStage=-1;routeIndex=0;routeCompleted=false;
   clearTraffic();crashOverlay.classList.remove('show');routeCompleteOverlay.classList.remove('show');routePopup.classList.remove('show');
-  damage=0;invincibleUntil=0;updateDamageMeter();
   updateHUD();updatePlayer();
 }
 function restartGame(){
@@ -762,55 +701,61 @@ function updateHUD(){
   updateRouteMission();
 }
 function updatePlayer(){
-  playerX=Math.max(IS_MOBILE?24:31,Math.min(IS_MOBILE?76:69,playerX));
-  const lean=Math.max(-8,Math.min(8,playerVelocity*.14));
-  const bounce=Math.sin(performance.now()/95)*(Math.min(speed,MAX_SPEED)/MAX_SPEED)*1.15;
+  const minX=IS_MOBILE?27:31;
+  const maxX=IS_MOBILE?73:69;
+  playerX=Math.max(minX,Math.min(maxX,playerX));
+  const lean=Math.max(-7,Math.min(7,playerVelocity*(IS_MOBILE?.38:1.05)));
+  const bounce=Math.sin(performance.now()/(IS_MOBILE?105:75))*(Math.min(speed,MAX_SPEED)/MAX_SPEED)*(IS_MOBILE?1.05:1.8);
   playerBus.style.left=playerX+'%';
   playerBus.style.transform=`translate3d(-50%,${bounce}px,0) rotate(${lean}deg)`;
-
   playerBus.classList.toggle('braking',keys.brake && speed>2);
   playerBus.classList.toggle('signal-left',playerVelocity < -1.25);
   playerBus.classList.toggle('signal-right',playerVelocity > 1.25);
 }
 
-/* RESPONSIVE ARCADE HANDLING — MOBILE FIRST */
+/* FINAL SPLIT HANDLING + PHYSICS
+   Desktop values remain close to the original smooth version.
+   Mobile is faster than before, but not so aggressive that it feels twitchy. */
+let hudAccumulator=0;
+const IS_MOBILE=matchMedia('(max-width:768px)').matches;
 function updatePhysics(dt){
-  const s=Math.min(dt/1000,.033);
+  const s=Math.min(dt/1000,.05);
 
-  /* Faster throttle response so the bus does not feel heavy on touch controls. */
-  if(keys.gas) speed+=96*s;
-  else speed-=13*s;
-  if(keys.brake) speed-=205*s;
+  if(IS_MOBILE){
+    if(keys.gas) speed+=76*s;
+    else speed-=11*s;
+    if(keys.brake) speed-=178*s;
+  }else{
+    if(keys.gas) speed+=58*s;
+    else speed-=9*s;
+    if(keys.brake) speed-=145*s;
+  }
   speed=Math.max(0,Math.min(MAX_SPEED,speed));
 
   const steerInput=(keys.right?1:0)-(keys.left?1:0);
-
-  /* Immediate steering: crossing the road should take roughly 0.7–1.0 sec,
-     not multiple seconds. Mobile gets a slightly higher response. */
-  const steerPower=IS_MOBILE ? (68+speed*.16) : (52+speed*.13);
-  const targetVelocity=steerInput*steerPower;
-  const response=steerInput ? (1-Math.pow(.000001,s)) : (1-Math.pow(.002,s));
+  const targetVelocity=IS_MOBILE
+    ? steerInput*(38+speed*.10)
+    : steerInput*(20+speed*.065);
+  const response=IS_MOBILE ? (1-Math.pow(.00012,s)) : (1-Math.pow(.001,s));
   playerVelocity+=(targetVelocity-playerVelocity)*response;
 
-  /* Stop the sideways drift quickly when the button is released. */
   if(!steerInput){
-    playerVelocity*=Math.max(0,1-18*s);
-    if(Math.abs(playerVelocity)<.08)playerVelocity=0;
+    playerVelocity*=Math.max(0,1-(IS_MOBILE?11:7)*s);
+    if(Math.abs(playerVelocity)<.03)playerVelocity=0;
   }
 
   playerX+=playerVelocity*s;
-  const minX=IS_MOBILE?24:31, maxX=IS_MOBILE?76:69;
+  const minX=IS_MOBILE?27:31, maxX=IS_MOBILE?73:69;
   playerX=Math.max(minX,Math.min(maxX,playerX));
-  if(playerX===minX||playerX===maxX) playerVelocity*=.18;
+  if(playerX===minX||playerX===maxX) playerVelocity*=IS_MOBILE?.28:.45;
 
   distance+=speed*s*.34;
   const stage=getProgressStage().stage;
   score+=speed*s*.055*stage.score;
   updatePlayer();
 
-  /* HUD is intentionally throttled on mobile; game physics stays at full RAF speed. */
   hudAccumulator+=dt;
-  if(hudAccumulator >= (IS_MOBILE ? 180 : 80)){
+  if(!IS_MOBILE || hudAccumulator>=120){
     hudAccumulator=0;
     updateHUD();
   }
@@ -847,24 +792,16 @@ function getTrafficFlow(){
     HARD:{min:6,target:7,max:9,interval:.62,clusterChance:.20,ai:.88},
     EXTREME:{min:8,target:9,max:12,interval:.42,clusterChance:.32,ai:1.12}
   };
-  const result={...flow[stage.name],stage};
-  if(IS_MOBILE){
-    result.min=Math.min(result.min,2);
-    result.target=Math.max(2,result.target-1);
-    result.max=Math.max(4,result.max-2);
-    result.interval*=1.12;
-  }
-  return result;
+  const selected={...flow[stage.name]};
+  if(IS_MOBILE){ selected.max=Math.max(4,selected.max-2); selected.target=Math.max(2,selected.target-1); selected.interval*=1.15; }
+  return {...selected,stage};
 }
 
 /* Match the visible trapezoid road: narrow at the horizon, wide near player. */
 function getRoadBounds(y){
   const p=Math.max(0,Math.min(1,(y-10)/90));
-  const horizonLeft=IS_MOBILE?34:42;
-  const horizonRight=IS_MOBILE?66:58;
-  const edge=IS_MOBILE?34:24;
-  const left=horizonLeft-(edge*p);
-  const right=horizonRight+(edge*p);
+  const left=42-(24*p);
+  const right=58+(24*p);
   return {left,right,p};
 }
 function roadUToX(u,y){
@@ -1069,7 +1006,7 @@ function updateTraffic(dt){
     // Larger, game-readable traffic while keeping perspective believable.
     // Far vehicles are visible; mid/near vehicles feel substantial without
     // becoming larger than the player's bus.
-    const scale=(IS_MOBILE?.43:.55)+p*(IS_MOBILE?.43:.65);
+    const scale=(.55+p*.65)*(IS_MOBILE?.72:1);
     v.el.style.left=x+'%';v.el.style.top=v.y+'%';
     v.el.style.width=(v.width*scale)+'px';v.el.style.height=(v.height*scale)+'px';
     v.el.style.transform='translateX(-50%)';
@@ -1117,31 +1054,9 @@ function updateTraffic(dt){
         busHit.top<vehicleHit.bottom&&
         busHit.bottom>vehicleHit.top;
 
-      if(collided){handleCollision(v);return;}
+      if(collided){crashGame();return;}
     }
   }
-}
-function updateDamageMeter(){
-  const pips=document.querySelectorAll('#damageMeter .damage-pip');
-  pips.forEach((pip,i)=>pip.classList.toggle('lost',i<damage));
-}
-function handleCollision(v){
-  const now=performance.now();
-  if(now<invincibleUntil)return;
-  damage++;
-  updateDamageMeter();
-  invincibleUntil=now+900;
-  if(v&&v.el){v.el.remove();const i=traffic.indexOf(v);if(i>=0)traffic.splice(i,1);}
-  gameScreen.classList.remove('damage-hit-flash');void gameScreen.offsetWidth;gameScreen.classList.add('damage-hit-flash');
-  setTimeout(()=>gameScreen.classList.remove('damage-hit-flash'),360);
-  if(damage>=3){crashGame();return;}
-  speed=Math.max(0,speed-28);
-  combo=0;
-  const left=3-damage;
-  const pop=document.getElementById('rewardPopup');
-  pop.textContent='💥 HIT! '+left+' CHANCE'+(left===1?'':'S')+' LEFT';
-  pop.classList.remove('show');void pop.offsetWidth;pop.classList.add('show');
-  setTimeout(()=>pop.classList.remove('show'),900);
 }
 function clearTraffic(){
   traffic.forEach(v=>v.el.remove());
@@ -1196,19 +1111,21 @@ document.querySelectorAll('[data-control]').forEach(b=>{
   const c=b.dataset.control;
   const down=e=>{
     e.preventDefault();
-    try{b.setPointerCapture(e.pointerId)}catch(_){}
+    if(e.pointerId!==undefined) try{b.setPointerCapture(e.pointerId)}catch(_){}
     keys[c]=true;b.classList.add('active');
   };
   const up=e=>{
-    e.preventDefault();
-    keys[c]=false;b.classList.remove('active');
-    try{b.releasePointerCapture(e.pointerId)}catch(_){}
+    e.preventDefault();keys[c]=false;b.classList.remove('active');
+    if(e.pointerId!==undefined) try{b.releasePointerCapture(e.pointerId)}catch(_){}
   };
-  b.addEventListener('contextmenu',e=>e.preventDefault());
   b.addEventListener('pointerdown',down,{passive:false});
   b.addEventListener('pointerup',up,{passive:false});
+  b.addEventListener('pointerleave',up,{passive:false});
   b.addEventListener('pointercancel',up,{passive:false});
-  b.addEventListener('lostpointercapture',()=>{keys[c]=false;b.classList.remove('active')});
+  b.addEventListener('contextmenu',e=>e.preventDefault());
+});
+document.addEventListener('contextmenu',e=>{
+  if(e.target.closest('button,.game-controls,.mobile-controls'))e.preventDefault();
 });
 
 function toggleLights(){document.body.classList.toggle('lights-on')}
@@ -1226,23 +1143,6 @@ function playHorn(){
   playerBus.classList.add('horn-active');
   setTimeout(()=>playerBus.classList.remove('horn-active'),650);
 }
-document.addEventListener('contextmenu',e=>{
-  if(e.target.closest('.game-controls,.mobile-controls,.drive-btn,.btn')) e.preventDefault();
-});
 </script>
 </body>
-</html><style>
-/* FINAL MOBILE SPOTIFY COMPACT FIX */
-@media (max-width:800px){
-  #spotifyDock{top:82px;width:86vw;max-width:350px}
-  .spotify-label{margin-bottom:5px;font-size:9px;letter-spacing:3px}
-  .spotify-player{height:108px;border-radius:16px}
-  .spotify-player iframe{height:152px}
-  .home-content{padding-top:184px}
-}
-@media (max-width:430px){
-  #spotifyDock{top:80px;width:86vw;max-width:340px}
-  .spotify-player{height:104px}
-  .home-content{padding-top:178px}
-}
-</style>
+</html>
